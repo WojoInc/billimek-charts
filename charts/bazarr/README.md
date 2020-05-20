@@ -17,6 +17,19 @@ To install the chart with the release name `my-release`:
 helm install --name my-release billimek/bazarr
 ```
 
+## Upgrading
+
+Version 1.0.0 used separate PVCs for TV and Movies. In order to keep this chart inline
+with changes to charts for Sonarr, etc. this was changed.
+
+This chart now uses a single PVC for all media. This means all of your media must be in, or be subdirectories of, a single media directory. If upgrading from v1 of the chart, do the following:
+1. [Uninstall](#uninstalling-the-chart) your current release
+2. On your backing store, organize your media, ie. media/tv, media/movies
+3. If using a pre-existing PVC, create a single new PVC for all of your media
+4. Refer to the [configuration](#configuration) for updates to the chart values
+5. Re-install the chart
+6. Update your folder settings in the app to point to the new PVC, which is mounted at /media
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-release` deployment:
