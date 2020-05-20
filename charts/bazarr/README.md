@@ -64,19 +64,12 @@ The following tables lists the configurable parameters of the Sentry chart and t
 | `persistence.config.storageClass` | Type of persistent volume claim | `-` |
 | `persistence.config.accessMode`  | Persistence access mode | `ReadWriteOnce` |
 | `persistence.config.skipuninstall`  | Do not delete the pvc upon helm uninstall | `false` |
-| `persistence.tv.enabled`      | Use persistent volume to store configuration data | `true` |
-| `persistence.tv.size`         | Size of persistent volume claim | `10Gi` |
-| `persistence.tv.existingClaim`| Use an existing PVC to persist data | `nil` |
-| `persistence.tv.storageClass` | Type of persistent volume claim | `-` |
-| `persistence.tv.accessMode`  | Persistence access mode | `ReadWriteOnce` |
-| `persistence.tv.skipuninstall`  | Do not delete the pvc upon helm uninstall | `false` |
-| `persistence.movies.enabled`      | Use persistent volume to store configuration data | `true` |
-| `persistence.movies.size`         | Size of persistent volume claim | `10Gi` |
-| `persistence.movies.existingClaim`| Use an existing PVC to persist data | `nil` |
-| `persistence.movies.storageClass` | Type of persistent volume claim | `-` |
-| `persistence.movies.accessMode`  | Persistence access mode | `ReadWriteOnce` |
-| `persistence.movies.skipuninstall`  | Do not delete the pvc upon helm uninstall | `false` |
-| `persistence.extraExistingClaimMounts`  | Optionally add multiple existing claims | `[]` |
+| `persistence.media.enabled`      | Use persistent volume to store media data | `true` |
+| `persistence.media.size`         | Size of persistent volume claim | `10Gi` |
+| `persistence.media.existingClaim`| Use an existing PVC to persist data | `nil` |
+| `persistence.media.storageClass` | Type of persistent volume claim | `-` |
+| `persistence.media.accessMode`  | Persistence access mode | `ReadWriteOnce` |
+| `persistence.media.skipuninstall`  | Do not delete the pvc upon helm uninstall | `false` |
 | `resources`                | CPU/Memory resource requests/limits | `{}` |
 | `nodeSelector`             | Node labels for pod assignment | `{}` |
 | `tolerations`              | Toleration labels for pod assignment | `[]` |
