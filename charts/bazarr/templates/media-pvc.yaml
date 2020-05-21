@@ -1,6 +1,6 @@
 
 {{- if and .Values.persistence.media.enabled (not .Values.persistence.media.existingClaim) }}
-kind: PersistenmediaolumeClaim
+kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ template "bazarr.fullname" . }}-media
