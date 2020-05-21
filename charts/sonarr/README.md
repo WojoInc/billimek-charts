@@ -32,7 +32,7 @@ The command removes all the Kubernetes components associated with the chart and 
 The following tables lists the configurable parameters of the Sentry chart and their default values.
 
 | Parameter                                   | Description                                                                                  | Default                                        |
-|---------------------------------------------|----------------------------------------------------------------------------------------------|------------------------------------------------|
+| ------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------- |
 | `image.repository`                          | Image repository                                                                             | `linuxserver/sonarr`                           |
 | `image.tag`                                 | Image tag. Possible values listed [here](https://hub.docker.com/r/linuxserver/sonarr/tags/). | `2.0.0.5344-ls60`                              |
 | `image.pullPolicy`                          | Image pull policy                                                                            | `IfNotPresent`                                 |
@@ -78,19 +78,12 @@ The following tables lists the configurable parameters of the Sentry chart and t
 | `persistence.config.storageClass`           | Type of persistent volume claim                                                              | `-`                                            |
 | `persistence.config.accessMode`             | Persistence access mode                                                                      | `ReadWriteOnce`                                |
 | `persistence.config.skipuninstall`          | Do not delete the pvc upon helm uninstall                                                    | `false`                                        |
-| `persistence.downloads.enabled`             | Use persistent volume for downloads                                                          | `true`                                         |
-| `persistence.downloads.size`                | Size of persistent volume claim                                                              | `10Gi`                                         |
-| `persistence.downloads.existingClaim`       | Use an existing PVC to persist data                                                          | `nil`                                          |
-| `persistence.downloads.storageClass`        | Type of persistent volume claim                                                              | `-`                                            |
-| `persistence.downloads.accessMode`          | Persistence access mode                                                                      | `ReadWriteOnce`                                |
-| `persistence.downloads.skipuninstall`       | Do not delete the pvc upon helm uninstall                                                    | `false`                                        |
-| `persistence.tv.enabled`                    | Use persistent volume for tv show persistence                                                | `true`                                         |
-| `persistence.tv.size`                       | Size of persistent volume claim                                                              | `10Gi`                                         |
-| `persistence.tv.existingClaim`              | Use an existing PVC to persist data                                                          | `nil`                                          |
-| `persistence.tv.storageClass`               | Type of persistent volume claim                                                              | `-`                                            |
-| `persistence.tv.accessMode`                 | Persistence access mode                                                                      | `ReadWriteOnce`                                |
-| `persistence.tv.skipuninstall`              | Do not delete the pvc upon helm uninstall                                                    | `false`                                        |
-| `persistence.extraExistingClaimMounts`      | Optionally add multiple existing claims                                                      | `[]`                                           |
+| `persistence.media.enabled`                 | Use persistent volume for media                                                              | `true`                                         |
+| `persistence.media.size`                    | Size of persistent volume claim                                                              | `10Gi`                                         |
+| `persistence.media.existingClaim`           | Use an existing PVC to persist data                                                          | `nil`                                          |
+| `persistence.media.storageClass`            | Type of persistent volume claim                                                              | `-`                                            |
+| `persistence.media.accessMode`              | Persistence access mode                                                                      | `ReadWriteOnce`                                |
+| `persistence.media.skipuninstall`           | Do not delete the pvc upon helm uninstall                                                    | `false`                                        |
 | `resources`                                 | CPU/Memory resource requests/limits                                                          | `{}`                                           |
 | `nodeSelector`                              | Node labels for pod assignment                                                               | `{}`                                           |
 | `tolerations`                               | Toleration labels for pod assignment                                                         | `[]`                                           |
@@ -113,6 +106,7 @@ helm install --name my-release -f values.yaml stable/sonarr
 ```
 
 ---
+
 **NOTE**
 
 If you get `Error: rendered manifests contain a resource that already exists. Unable to continue with install: existing resource conflict: ...` it may be because you uninstalled the chart with `skipuninstall` enabled, you need to manually delete the pvc or use `existingClaim`.
