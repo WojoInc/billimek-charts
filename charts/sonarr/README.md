@@ -97,6 +97,7 @@ The following tables lists the configurable parameters of the Sentry chart and t
 | `persistence.media.storageClass`            | Type of persistent volume claim                                                              | `-`                                            |
 | `persistence.media.accessMode`              | Persistence access mode                                                                      | `ReadWriteOnce`                                |
 | `persistence.media.skipuninstall`           | Do not delete the pvc upon helm uninstall                                                    | `false`                                        |
+| `persistence.extraExistingClaimMounts`      | Optionally add multiple existing claims                                                      | `[]`                                           |
 | `resources`                                 | CPU/Memory resource requests/limits                                                          | `{}`                                           |
 | `nodeSelector`                              | Node labels for pod assignment                                                               | `{}`                                           |
 | `tolerations`                               | Toleration labels for pod assignment                                                         | `[]`                                           |
