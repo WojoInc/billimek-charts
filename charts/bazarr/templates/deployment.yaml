@@ -69,6 +69,11 @@ spec:
             {{- if .Values.persistence.media.subPath }}
               subPath: {{ .Values.persistence.media.subPath }}
             {{- end }}
+            {{- range .Values.persistence.extraExistingClaimMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: {{ .readOnly }}
+            {{- end }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       volumes:
@@ -85,6 +90,11 @@ spec:
           claimName: {{ if .Values.persistence.media.existingClaim }}{{ .Values.persistence.media.existingClaim }}{{- else }}{{ template "bazarr.fullname" . }}-media{{- end }}
       {{- else }}
         emptyDir: {}
+      {{- end }}
+      {{- range .Values.persistence.extraExistingClaimMounts }}
+      - name: {{ .name }}
+        persistentVolumeClaim:
+          claimName: {{ .existingClaim }}
       {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
