@@ -64,18 +64,12 @@ The following tables lists the configurable parameters of the Sentry chart and t
 | `persistence.config.storageClass` | Type of persistent volume claim | `-` |
 | `persistence.config.accessMode`  | Persistence access mode | `ReadWriteOnce` |
 | `persistence.config.skipuninstall`  | Do not delete the pvc upon helm uninstall | `false` |
-| `persistence.downloads.enabled`      | Use persistent volume to store configuration data | `true` |
-| `persistence.downloads.size`         | Size of persistent volume claim | `10Gi` |
-| `persistence.downloads.existingClaim`| Use an existing PVC to persist data | `nil` |
-| `persistence.downloads.storageClass` | Type of persistent volume claim | `-` |
-| `persistence.downloads.accessMode`  | Persistence access mode | `ReadWriteOnce` |
-| `persistence.downloads.skipuninstall`  | Do not delete the pvc upon helm uninstall | `false` |
-| `persistence.music.enabled`      | Use persistent volume to store configuration data | `true` |
-| `persistence.music.size`         | Size of persistent volume claim | `10Gi` |
-| `persistence.music.existingClaim`| Use an existing PVC to persist data | `nil` |
-| `persistence.music.storageClass` | Type of persistent volume claim | `-` |
-| `persistence.music.accessMode`  | Persistence access mode | `ReadWriteOnce` |
-| `persistence.music.skipuninstall`  | Do not delete the pvc upon helm uninstall | `false` |
+| `persistence.media.enabled`      | Use persistent volume to store configuration data | `true` |
+| `persistence.media.size`         | Size of persistent volume claim | `10Gi` |
+| `persistence.media.existingClaim`| Use an existing PVC to persist data | `nil` |
+| `persistence.media.storageClass` | Type of persistent volume claim | `-` |
+| `persistence.media.accessMode`  | Persistence access mode | `ReadWriteOnce` |
+| `persistence.media.skipuninstall`  | Do not delete the pvc upon helm uninstall | `false` |
 | `persistence.extraExistingClaimMounts`  | Optionally add multiple existing claims | `[]` |
 | `resources`                | CPU/Memory resource requests/limits | `{}` |
 | `nodeSelector`             | Node labels for pod assignment | `{}` |
