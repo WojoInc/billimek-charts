@@ -17,6 +17,19 @@ To install the chart with the release name `my-release`:
 helm install --name my-release billimek/lidarr
 ```
 
+## Upgrading
+
+Chart versions 1.0.1 and earlier used separate PVCs for Downloads and Music. This presented an issue where Lidarr would be unable to hard-link files between the /downloads and /music directories when importing media. This is caused because each PVC is exposed to the pod as a separate filesystem. This resulted in Lidarr copying files rather than linking; using additional storage without the user's knowledge.
+
+This chart now uses a single PVC for Downloads and Music. This means all of your media (and downloads) must be in, or be subdirectories of, a single directory. If upgrading from an earlier version of the chart, do the following:
+
+1. [Uninstall](#uninstalling-the-chart) your current release
+2. On your backing store, organize your media, ie. media/music, media/downloads
+3. If using a pre-existing PVC, create a single new PVC for all of your media
+4. Refer to the [configuration](#configuration) for updates to the chart values
+5. Re-install the chart
+6. Update your settings in the app to point to the new PVC, which is mounted at /media. This can be done using Lidarr's `Mass Editor` under the `Library` tab. Simply select all artists in your library, and use the editor to change the `Root Folder` and hit save.
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-release` deployment:
