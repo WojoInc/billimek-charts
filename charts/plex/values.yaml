@@ -67,7 +67,7 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-service:
+serviceTCP:
   type: ClusterIP
   port: 32400
   ## Specify the nodePort value for the LoadBalancer and NodePort service types.
@@ -79,6 +79,24 @@ service:
   ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
   ##
   annotations: {}
+  # metallb.universe.tf/allow-shared-ip: plex-svc
+  labels: {}
+  ## Use loadBalancerIP to request a specific static IP,
+  ## otherwise leave blank
+  ##
+  loadBalancerIP:
+  # loadBalancerSourceRanges: []
+  ## Set the externalTrafficPolicy in the Service to either Cluster or Local
+  # externalTrafficPolicy: Cluster
+
+serviceUDP:
+  type: ClusterIP
+  ## Provide any additional annotations which may be required. This can be used to
+  ## set the LoadBalancer service type to internal only.
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+  ##
+  annotations: {}
+  # metallb.universe.tf/allow-shared-ip: plex-svc
   labels: {}
   ## Use loadBalancerIP to request a specific static IP,
   ## otherwise leave blank
@@ -139,6 +157,8 @@ plexPreferences:
     mountPath: /etc/cont-init.d/41-plex-preferences
     subPath: 41-plex-preferences
 
+hostNetwork: false
+
 persistence:
   transcode:
     # We want to enable a transcode pvc
@@ -167,6 +187,8 @@ persistence:
 
 
   data:
+    # We want to enable a data pvc
+    enabled: true
     # Optionally specify claimName to manually override the PVC to be used for
     # the data directory. If claimName is specified, storageClass and size are
     # ignored.
@@ -188,6 +210,15 @@ persistence:
     # with the additional field 'name'
     # - claimName: "special-tv"
     #   name: 'foo'
+
+  extraMounts: []
+  ## Include additional claims that can be mounted inside the
+  ## pod. This is useful if you wish to use different paths with categories
+  ## Claim will me mounted as /{mountPath} if specified. If no {mountPath} is given,
+  ## mountPath will default to {name}
+  # - name: video
+  #   claimName: video-claim
+  #   mountPath: /mnt/path/in/pod
 
   config:
     # Optionally specify claimName to manually override the PVC to be used for
@@ -215,6 +246,10 @@ certificate:
   # the location specified in pfxInContainerPath.
   pkcsMangler:
     enabled: false
+    # The Image to use for pkcsMangler
+    image:
+      repository: tlsprint/openssl
+      tag: 1.1.1f
     configmap:
       labels: {}
       annotations: {}

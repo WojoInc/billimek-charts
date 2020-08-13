@@ -33,6 +33,10 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- if .Values.hostNetwork }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      dnsPolicy: ClusterFirstWithHostNet
+    {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
   {{- if .Values.certificate.pkcsMangler.enabled }}
@@ -40,7 +44,7 @@ spec:
       # This is ugly, but it does work to create a pks file that will work with PLEX from the tls.crt and tls.key that cert-manager normally creates
       {{- if .Values.certificate.pkcsMangler.enabled }}
       - name: pkcsmangler-init-container
-        image: tlsprint/openssl:1.1.1f
+        image: "{{ .Values.certificate.pkcsMangler.image.repository }}:{{ .Values.certificate.pkcsMangler.image.tag }}"
         imagePullPolicy: Always
         command: ["/bin/sh"]
         args: ["-c", "openssl pkcs12 -export -passout pass:$(PKCSMANGLER_PFXPASSWORD) -out /shared/cert.pfx -inkey {{ .Values.certificate.pkcsMangler.certificateSecret.volume.mountPath }}/{{ .Values.certificate.pkcsMangler.certificateSecret.keyName }} -in {{ .Values.certificate.pkcsMangler.certificateSecret.volume.mountPath }}/{{ .Values.certificate.pkcsMangler.certificateSecret.crtName }}; chmod 0444 /shared/cert.pfx"]
@@ -64,8 +68,27 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: pms
-              containerPort: 32400
+          - name: pms
+            protocol: TCP
+            containerPort: 32400
+          - name: plex-dlna
+            protocol: TCP
+            containerPort: 32469
+          - name: plex-dlna-udp
+            protocol: UDP
+            containerPort: 1900
+          - name: plex-gdm1
+            protocol: UDP
+            containerPort: 32410
+          - name: plex-gdm2
+            protocol: UDP
+            containerPort: 32412
+          - name: plex-gdm3
+            protocol: UDP
+            containerPort: 32413
+          - name: plex-gdm4
+            protocol: UDP
+            containerPort: 32414
           env:
           - name: TZ
             value: "{{ .Values.timezone }}"
@@ -87,11 +110,13 @@ spec:
   {{- else }}
             value: "{{ template "plex.fullname" . }}-transcode"
   {{- end }}
+  {{- if .Values.persistence.data.enabled }}
           - name: DATA_PVC
-  {{- if .Values.persistence.data.claimName }}
+    {{- if .Values.persistence.data.claimName }}
             value: "{{ .Values.persistence.data.claimName }}"
-  {{- else }}
+    {{- else }}
             value: "{{ template "plex.fullname" . }}-data"
+    {{- end }}
   {{- end }}
           - name: CONFIG_PVC
   {{- if .Values.persistence.config.claimName }}
@@ -167,10 +192,12 @@ spec:
             failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
             timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
           volumeMounts:
+          {{- if .Values.persistence.data.enabled }}
           - name: data
             mountPath: /data
           {{- if .Values.persistence.data.subPath }}
             subPath: {{ .Values.persistence.data.subPath }}
+          {{ end }}
           {{ end }}
           - name: config
             mountPath: /config
@@ -185,6 +212,14 @@ spec:
           {{-  range .Values.persistence.extraData }}
           - mountPath: "/data-{{ .name }}"
             name: "extradata-{{ .name }}"
+          {{- end }}
+          {{-  range .Values.persistence.extraMounts }}
+          {{- if .mountPath }}
+          - mountPath: /{{ .mountPath }}
+          {{- else }}
+          - mountPath: /{{ .name }}
+          {{- end }}
+            name: {{ .name }}
           {{- end }}
           - name: shared
             mountPath: /shared
@@ -205,12 +240,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+{{- if .Values.persistence.data.enabled }}
       - name: data
         persistentVolumeClaim:
-{{- if .Values.persistence.data.claimName }}
+  {{- if .Values.persistence.data.claimName }}
           claimName: "{{ .Values.persistence.data.claimName }}"
-{{- else }}
+  {{- else }}
           claimName: "{{ template "plex.fullname" . }}-data"
+  {{- end }}
 {{- end }}
       - name: config
         persistentVolumeClaim:
@@ -243,6 +280,11 @@ spec:
 {{- else }}
           claimName: "extradata-{{ .name }}"
 {{- end }}
+{{- end }}
+{{- range .Values.persistence.extraMounts }}
+      - name: {{ .name }}
+        persistentVolumeClaim:
+          claimName: {{ .claimName }}
 {{- end }}
       - name: shared
         emptyDir: {}

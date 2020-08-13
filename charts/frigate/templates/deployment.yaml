@@ -29,6 +29,27 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      initContainers:
+        - name: config
+          securityContext:
+            readOnlyRootFilesystem: true
+          image: "{{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}"
+          imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /frigate-config
+              name: configmap
+            - mountPath: /masks
+              name: masks
+            - mountPath: /config
+              name: config
+              readOnly: false
+          command: ['sh', '-c']
+          args:
+            - cp /frigate-config/* /config;
+              {{- if .Values.masksConfigMap }}
+              cp /masks/* /config;
+              {{- end }}
+
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -39,6 +60,7 @@ spec:
             - name: http
               containerPort: 5000
               protocol: TCP
+          {{- if .Values.probes.liveness.enabled }}
           livenessProbe:
             httpGet:
               path: /
@@ -47,6 +69,8 @@ spec:
             initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
             failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
             timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.probes.readiness.enabled }}
           readinessProbe:
             httpGet:
               path: /
@@ -55,6 +79,16 @@ spec:
             initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
             failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
             timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.probes.startup.enabled }}
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+          {{- end }}
           env:
             {{- if .Values.timezone }}
             - name: TZ
@@ -62,6 +96,11 @@ spec:
             {{- end }}
             - name: FRIGATE_RTSP_PASSWORD
               value: "{{ .Values.rtspPassword }}"
+          envFrom:
+          {{- range .Values.extraSecretForEnvFrom }}
+            - secretRef:
+                name: {{ . }}
+          {{- end }}
           volumeMounts:
             {{- if .Values.coral.enabled }}
             - mountPath: /dev/bus/usb
@@ -75,8 +114,18 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: config
+          emptyDir: {}
+        - name: configmap
           configMap:
             name: {{ template "frigate.fullname" . }}
+        - name: masks
+          {{- if .Values.masksConfigMap }}
+          configMap:
+            name: {{ .Values.masksConfigMap }}
+          {{- else }}
+          emptyDir:
+            {}
+          {{- end }}
         {{- if .Values.coral.enabled }}
         - name: usb
           hostPath:

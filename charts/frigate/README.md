@@ -49,18 +49,20 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Configuration
 
-The following tables lists the configurable parameters of the Sentry chart and their default values.
+The following tables lists the configurable parameters of the Frigate chart and their default values.
 
 | Parameter                  | Description                         | Default                                                 |
 |----------------------------|-------------------------------------|---------------------------------------------------------|
 | `image.repository`         | Image repository | `blakeblackshear/frigate` |
-| `image.tag`                | Image tag. Possible values listed [here](https://hub.docker.com/r/blakeblackshear/frigate/tags/).| `0.5.0`|
+| `image.tag`                | Image tag. Possible values listed [here](https://hub.docker.com/r/blakeblackshear/frigate/tags/).| `0.5.1`|
 | `image.pullPolicy`         | Image pull policy | `IfNotPresent` |
 | `strategyType`             | Specifies the strategy used to replace old Pods by new ones | `Recreate` |
 | `timezone`                 | Timezone the frigate instance should run as, e.g. 'America/New_York' | `UTC` |
 | `rtspPassword`             | Password to use for RTSP cameras | `password` |
+| `extraSecretForEnvFrom`    | Secrets containing env variables for  | `[]` |
 | `coral.enabled`            | Use the Coral USB device | `false` |
 | `coral.hostPath`           | Host Path to reference USB device location (on the host) | `/dev/bus/usb` |
+| `masksConfigMap`           | Reference to existing ConfigMap that contains camera masks - [more info](https://github.com/blakeblackshear/frigate#masks-and-limiting-detection-to-a-certain-area) | `{}` |
 | `shmSize`                  | Shared memory size for processing | `1Gi` |
 | `config`                   | frigate configuration - see [config.yaml](https://github.com/blakeblackshear/frigate/blob/master/config/config.yml) for example  | `{}` |
 | `Service.type`          | Kubernetes service type for the frigate GUI | `ClusterIP` |
